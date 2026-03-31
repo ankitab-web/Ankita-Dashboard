@@ -500,15 +500,17 @@ const now = new Date();
 const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 document.getElementById('live-date').textContent = days[now.getDay()]+', '+now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear();
-document.getElementById('log-date').value = now.toISOString().split('T')[0];
+const logDateEl=document.getElementById('log-date'); if(logDateEl) logDateEl.value=now.toISOString().split('T')[0];
 
 // ── Tab switching ──
 function switchTab(name) {
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  const names=['today','clients','plan','log','mis','reminders','ai'];
-  document.querySelectorAll('.tab')[names.indexOf(name)].classList.add('active');
-  document.getElementById('panel-'+name).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>{
+    if(t.getAttribute('onclick') && t.getAttribute('onclick').includes("'"+name+"'")) t.classList.add('active');
+  });
+  const panel = document.getElementById('panel-'+name);
+  if(panel) panel.classList.add('active');
   if(name==='daily') renderLogEntries();
 }
 
