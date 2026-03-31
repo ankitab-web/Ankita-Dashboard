@@ -227,19 +227,26 @@ input, select, textarea { font-family: inherit; }
   </div>
 </div>
 <div class="tabs">
-  <div class="tab active" onclick="switchTab('today')">Today's tasks</div>
+  <div class="tab active" onclick="switchTab('daily')">📋 Daily Work</div>
   <div class="tab" onclick="switchTab('clients')">My 6 clients</div>
   <div class="tab" onclick="switchTab('plan')">Client plan</div>
-  <div class="tab" onclick="switchTab('log')">Daily log</div>
+  
   <div class="tab" onclick="switchTab('mis')">MIS report</div>
   <div class="tab" onclick="switchTab('reminders')">Reminders</div>
   <div class="tab" onclick="switchTab('ai')">AI shortcuts</div>
 </div>
 
-<!-- TODAY -->
-<div id="panel-today" class="panel active">
-  <div class="day-header"><span>Daily task tracker</span><span style="font-size:12px;color:var(--color-text-tertiary)" id="day-progress-text">0 of 0 done</span></div>
+<!-- DAILY WORK (merged Today Tasks + Daily Log) -->
+<div id="panel-daily" class="panel active">
+
+  <!-- Top bar: date + progress -->
+  <div class="day-header">
+    <span>Daily Work Tracker</span>
+    <span style="font-size:12px;color:var(--color-text-tertiary)" id="day-progress-text">0 of 0 done</span>
+  </div>
   <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+
+  <!-- Task sections -->
   <div class="section-title">🔴 Urgent</div><div id="tasks-urgent"></div>
   <div class="section-title">🟡 Important</div><div id="tasks-important"></div>
   <div class="section-title">🟢 Plan</div><div id="tasks-plan"></div>
@@ -251,6 +258,99 @@ input, select, textarea { font-family: inherit; }
     <button class="btn-save" onclick="addTask()">Save</button>
     <button class="btn-cancel" onclick="hideAddTask()">Cancel</button>
   </div>
+
+  <!-- Additional Details section (optional, for MIS enrichment) -->
+  <div style="margin-top:18px;border-top:1px solid var(--color-border-tertiary);padding-top:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleDailyDetails()">
+      <div>
+        <div style="font-size:13px;font-weight:500">📊 Add extra details for MIS report <span style="font-size:11px;color:var(--color-text-tertiary);font-weight:400">(optional)</span></div>
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">Attendance, recruitment & compliance numbers — helps AI generate a richer MIS</div>
+      </div>
+      <span id="daily-details-arrow" style="font-size:13px;color:var(--color-text-tertiary)">▼ Expand</span>
+    </div>
+
+    <div id="daily-details-body" style="display:none;margin-top:12px">
+      <div class="log-top" style="margin-bottom:10px">
+        <select id="log-client"><option value="">Select client...</option><option>Suyash</option><option>Watch Your Health</option><option>Openspace Services</option><option>Sudha Solutions</option><option>Bright Brain Tech</option><option>Capsicum Media Works</option></select>
+        <input type="date" id="log-date">
+      </div>
+      <div class="log-category">
+        <div class="log-cat-header" onclick="toggleCat('cat-att')">📊 Attendance & leaves <span id="cat-att-arrow">▼</span></div>
+        <div class="log-cat-body" id="cat-att">
+          <div class="num-row">
+            <div class="log-field"><label>Total employees present</label><input type="number" id="att-present" placeholder="e.g. 118" min="0"></div>
+            <div class="log-field"><label>Employees absent</label><input type="number" id="att-absent" placeholder="e.g. 2" min="0"></div>
+          </div>
+          <div class="num-row">
+            <div class="log-field"><label>Leaves approved today</label><input type="number" id="att-leaves" placeholder="e.g. 3" min="0"></div>
+            <div class="log-field"><label>Late arrivals / half days</label><input type="number" id="att-late" placeholder="e.g. 1" min="0"></div>
+          </div>
+          <div class="log-field"><label>Notes</label><textarea id="att-notes" placeholder="e.g. Rahul on sick leave, Priya WFH approved..."></textarea></div>
+        </div>
+      </div>
+      <div class="log-category">
+        <div class="log-cat-header" onclick="toggleCat('cat-rec')">🧑‍💼 Recruitment updates <span id="cat-rec-arrow">▼</span></div>
+        <div class="log-cat-body" id="cat-rec">
+          <div class="num-row">
+            <div class="log-field"><label>CVs screened today</label><input type="number" id="rec-cvs" placeholder="e.g. 5" min="0"></div>
+            <div class="log-field"><label>Interviews scheduled</label><input type="number" id="rec-int" placeholder="e.g. 2" min="0"></div>
+          </div>
+          <div class="num-row">
+            <div class="log-field"><label>Offers made</label><input type="number" id="rec-offers" placeholder="e.g. 1" min="0"></div>
+            <div class="log-field"><label>Joinings today</label><input type="number" id="rec-join" placeholder="e.g. 0" min="0"></div>
+          </div>
+          <div class="log-field"><label>Open positions being worked on</label><textarea id="rec-notes" placeholder="e.g. Hiring for 2 Java developers at WYH..."></textarea></div>
+        </div>
+      </div>
+      <div class="log-category">
+        <div class="log-cat-header" onclick="toggleCat('cat-comp')">⚖️ Compliance & payroll <span id="cat-comp-arrow">▼</span></div>
+        <div class="log-cat-body" id="cat-comp">
+          <div class="log-field"><label>Compliance tasks completed today</label><textarea id="comp-tasks" placeholder="e.g. Submitted PF data, ESI challan prepared..."></textarea></div>
+          <div class="log-field"><label>Payroll actions taken</label><textarea id="comp-payroll" placeholder="e.g. Processed salary for Oct, corrected CTC for 2 employees..."></textarea></div>
+        </div>
+      </div>
+      <div class="log-category">
+        <div class="log-cat-header" onclick="toggleCat('cat-docs')">📄 Letters, policies & documents <span id="cat-docs-arrow">▼</span></div>
+        <div class="log-cat-body" id="cat-docs">
+          <div class="log-field"><label>Documents prepared / sent today</label><textarea id="docs-list" placeholder="e.g. Offer letter for Amit, Warning letter..."></textarea></div>
+          <div class="log-field"><label>Policies worked on</label><textarea id="docs-policy" placeholder="e.g. Drafted WFH policy for Sudha Solutions..."></textarea></div>
+        </div>
+      </div>
+      <div class="log-category">
+        <div class="log-cat-header" onclick="toggleCat('cat-issues')">🔔 Employee issues & relations <span id="cat-issues-arrow">▼</span></div>
+        <div class="log-cat-body" id="cat-issues">
+          <div class="num-row">
+            <div class="log-field"><label>Issues raised today</label><input type="number" id="issue-raised" placeholder="e.g. 2" min="0"></div>
+            <div class="log-field"><label>Issues resolved today</label><input type="number" id="issue-resolved" placeholder="e.g. 1" min="0"></div>
+          </div>
+          <div class="log-field"><label>Details</label><textarea id="issue-notes" placeholder="e.g. Salary dispute raised by Rohit..."></textarea></div>
+        </div>
+      </div>
+      <div class="log-category">
+        <div class="log-cat-header" onclick="toggleCat('cat-train')">🎓 Training, appraisals & other work <span id="cat-train-arrow">▼</span></div>
+        <div class="log-cat-body" id="cat-train">
+          <div class="log-field"><label>Training / induction activities done</label><textarea id="train-done" placeholder="e.g. Conducted Day 1 induction for 2 new joiners..."></textarea></div>
+          <div class="log-field"><label>Appraisal / performance review work</label><textarea id="train-appraisal" placeholder="e.g. Collected KRA forms from 5 employees..."></textarea></div>
+          <div class="log-field"><label>Anything else done today</label><textarea id="train-other" placeholder="e.g. Attended client call, updated org chart..."></textarea></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;align-items:center">
+        <button class="btn-primary" onclick="saveLog()">💾 Save to MIS log</button>
+        <button class="btn-ghost" onclick="clearLogForm()">Clear</button>
+        <span id="log-saved-msg" style="display:none;font-size:12px;color:#3B6D11;padding:5px 12px;background:#EAF3DE;border-radius:8px;border:1px solid #C0DD97">✅ Saved! This will appear in your MIS report.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MIS quick-link -->
+  <div style="margin-top:16px;padding:12px 14px;background:#E6F1FB;border-radius:10px;border:1px solid #85B7EB;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+    <div>
+      <div style="font-size:13px;font-weight:500;color:#185FA5">📈 Ready to generate your MIS report?</div>
+      <div style="font-size:11px;color:#185FA5;margin-top:2px;opacity:0.8">Your tasks are automatically included — just click to generate</div>
+    </div>
+    <button class="btn-primary" onclick="switchTab('mis')">Go to MIS Report →</button>
+  </div>
+
 </div>
 
 <!-- CLIENTS -->
@@ -323,100 +423,6 @@ input, select, textarea { font-family: inherit; }
     <div class="quick-ref-row"><div class="qr-label">Onboarding</div><div class="qr-text">Offer → 30 days → 5 days → Day 1 → Week 1 → 30/60/90 reviews</div></div>
     <div class="quick-ref-row"><div class="qr-label">Offboarding</div><div class="qr-text">Notice → Handover → Final day → Access revoked → Final pay</div></div>
   </div>
-</div>
-
-<!-- DAILY LOG -->
-<div id="panel-log" class="panel">
-  <div style="font-size:14px;font-weight:500;margin-bottom:4px">Daily HR work log</div>
-  <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:14px">Log everything you do for each client — big or small. This builds your monthly MIS automatically.</div>
-
-  <div class="log-top">
-    <select id="log-client"><option value="">Select client...</option><option>Suyash</option><option>Watch Your Health</option><option>Openspace Services</option><option>Sudha Solutions</option><option>Bright Brain Tech</option><option>Capsicum Media Works</option></select>
-    <input type="date" id="log-date">
-  </div>
-
-  <!-- Attendance -->
-  <div class="log-category">
-    <div class="log-cat-header" onclick="toggleCat('cat-att')">📊 Attendance & leaves <span id="cat-att-arrow">▼</span></div>
-    <div class="log-cat-body" id="cat-att">
-      <div class="num-row">
-        <div class="log-field"><label>Total employees present</label><input type="number" id="att-present" placeholder="e.g. 118" min="0"></div>
-        <div class="log-field"><label>Employees absent</label><input type="number" id="att-absent" placeholder="e.g. 2" min="0"></div>
-      </div>
-      <div class="num-row">
-        <div class="log-field"><label>Leaves approved today</label><input type="number" id="att-leaves" placeholder="e.g. 3" min="0"></div>
-        <div class="log-field"><label>Late arrivals / half days</label><input type="number" id="att-late" placeholder="e.g. 1" min="0"></div>
-      </div>
-      <div class="log-field"><label>Notes (e.g. who was absent, reason, any issues)</label><textarea id="att-notes" placeholder="e.g. Rahul on sick leave, Priya WFH approved..."></textarea></div>
-    </div>
-  </div>
-
-  <!-- Recruitment -->
-  <div class="log-category">
-    <div class="log-cat-header" onclick="toggleCat('cat-rec')">🧑‍💼 Recruitment updates <span id="cat-rec-arrow">▼</span></div>
-    <div class="log-cat-body" id="cat-rec">
-      <div class="num-row">
-        <div class="log-field"><label>CVs screened today</label><input type="number" id="rec-cvs" placeholder="e.g. 5" min="0"></div>
-        <div class="log-field"><label>Interviews scheduled</label><input type="number" id="rec-int" placeholder="e.g. 2" min="0"></div>
-      </div>
-      <div class="num-row">
-        <div class="log-field"><label>Offers made</label><input type="number" id="rec-offers" placeholder="e.g. 1" min="0"></div>
-        <div class="log-field"><label>Joinings today</label><input type="number" id="rec-join" placeholder="e.g. 0" min="0"></div>
-      </div>
-      <div class="log-field"><label>Open positions being worked on</label><textarea id="rec-notes" placeholder="e.g. Hiring for 2 Java developers at WYH, shortlisted 3 candidates..."></textarea></div>
-    </div>
-  </div>
-
-  <!-- Compliance -->
-  <div class="log-category">
-    <div class="log-cat-header" onclick="toggleCat('cat-comp')">⚖️ Compliance & payroll <span id="cat-comp-arrow">▼</span></div>
-    <div class="log-cat-body" id="cat-comp">
-      <div class="log-field"><label>Compliance tasks completed today</label><textarea id="comp-tasks" placeholder="e.g. Submitted PF data for Sept, ESI challan prepared, updated Form 16 for 2 employees..."></textarea></div>
-      <div class="log-field"><label>Payroll actions taken</label><textarea id="comp-payroll" placeholder="e.g. Verified timesheets, processed full & final for 1 leaver..."></textarea></div>
-      <div class="log-field"><label>Pending compliance items to follow up</label><textarea id="comp-pending" placeholder="e.g. Gratuity calculation for Suresh pending..."></textarea></div>
-    </div>
-  </div>
-
-  <!-- Letters & Documents -->
-  <div class="log-category">
-    <div class="log-cat-header" onclick="toggleCat('cat-docs')">📄 Letters, policies & documents <span id="cat-docs-arrow">▼</span></div>
-    <div class="log-cat-body" id="cat-docs">
-      <div class="log-field"><label>Documents prepared / sent today</label><textarea id="docs-list" placeholder="e.g. Offer letter for Amit (Java Dev), Warning letter for attendance, Experience letter for Sneha..."></textarea></div>
-      <div class="log-field"><label>Policies worked on</label><textarea id="docs-policy" placeholder="e.g. Drafted WFH policy for Sudha Solutions, updated leave policy..."></textarea></div>
-    </div>
-  </div>
-
-  <!-- Employee Issues -->
-  <div class="log-category">
-    <div class="log-cat-header" onclick="toggleCat('cat-issues')">🔔 Employee issues & relations <span id="cat-issues-arrow">▼</span></div>
-    <div class="log-cat-body" id="cat-issues">
-      <div class="num-row">
-        <div class="log-field"><label>Issues raised today</label><input type="number" id="issue-raised" placeholder="e.g. 2" min="0"></div>
-        <div class="log-field"><label>Issues resolved today</label><input type="number" id="issue-resolved" placeholder="e.g. 1" min="0"></div>
-      </div>
-      <div class="log-field"><label>Details of issues handled</label><textarea id="issue-notes" placeholder="e.g. Salary dispute raised by Rohit — escalated to manager. Harassment complaint — investigated & closed..."></textarea></div>
-    </div>
-  </div>
-
-  <!-- Training & Performance -->
-  <div class="log-category">
-    <div class="log-cat-header" onclick="toggleCat('cat-train')">🎓 Training, appraisals & other work <span id="cat-train-arrow">▼</span></div>
-    <div class="log-cat-body" id="cat-train">
-      <div class="log-field"><label>Training / induction activities done</label><textarea id="train-done" placeholder="e.g. Conducted Day 1 induction for 2 new joiners at Capsicum, safety training arranged..."></textarea></div>
-      <div class="log-field"><label>Appraisal / performance review work</label><textarea id="train-appraisal" placeholder="e.g. Collected KRA forms from 5 employees, shared appraisal templates..."></textarea></div>
-      <div class="log-field"><label>Anything else you did today for this client</label><textarea id="train-other" placeholder="e.g. Attended client call, updated org chart, vendor meeting, HRIS data update, anything at all..."></textarea></div>
-    </div>
-  </div>
-
-  <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
-    <button class="btn-primary" onclick="saveLog()">Save today's log</button>
-    <button class="btn-ghost" onclick="clearLogForm()">Clear form</button>
-  </div>
-  <div id="log-saved-msg" style="display:none;font-size:12px;color:#3B6D11;margin-top:8px;padding:6px 12px;background:#EAF3DE;border-radius:8px;border:1px solid #C0DD97">✅ Log saved! It will be included in the monthly MIS report.</div>
-
-  <!-- Past entries -->
-  <div class="section-title" style="margin-top:20px">Recent log entries</div>
-  <div id="log-entries"></div>
 </div>
 
 <!-- MIS REPORT -->
@@ -503,7 +509,7 @@ function switchTab(name) {
   const names=['today','clients','plan','log','mis','reminders','ai'];
   document.querySelectorAll('.tab')[names.indexOf(name)].classList.add('active');
   document.getElementById('panel-'+name).classList.add('active');
-  if(name==='log') renderLogEntries();
+  if(name==='daily') renderLogEntries();
 }
 
 // ── Log categories toggle ──
@@ -612,7 +618,22 @@ async function generateMIS() {
   const monthName=new Date(yr,parseInt(mn)-1,1).toLocaleString('default',{month:'long'});
 
   // Build log summary for AI
-  let logSummary = filtered.length===0
+  // Also pull task data for this client & month
+  const taskSummary = (()=>{
+    const monthTasks = tasks.filter(t => t.client === client && t.createdDate && t.createdDate.startsWith(month));
+    const allClientTasks = tasks.filter(t => t.client === client);
+    const done = allClientTasks.filter(t=>t.done);
+    const pending = allClientTasks.filter(t=>!t.done);
+    const carried = allClientTasks.filter(t=>!t.done && t.carriedFrom);
+    if(allClientTasks.length === 0) return '';
+    const lines = allClientTasks.map(t=>`[${t.priority.toUpperCase()}] ${t.text} — ${t.done?'COMPLETED':'PENDING'}${t.pinned?' (pinned/priority)':''}${t.carriedFrom?' (carried forward)':''}`);
+    return `Tasks tracked for ${client}:
+${lines.join('
+')}
+Summary: ${done.length} completed, ${pending.length} pending, ${carried.length} carried forward.`;
+  })();
+
+  let logSummary = filtered.length===0 && !taskSummary
     ? 'No daily logs were recorded for this client this month. Please generate a template MIS report.'
     : filtered.map((l,i)=>{
         const parts=[];
@@ -641,6 +662,8 @@ Month: ${monthName} ${yr}
 
 Daily work logs from Ankita for this month:
 ${logSummary}
+
+${taskSummary ? "Task tracker data:\n" + taskSummary : ""}
 
 Please generate a complete, professional Monthly HR MIS Report with these sections:
 1. Executive Summary (3-4 sentences overview of the month)
@@ -787,7 +810,7 @@ function hideAddTask(){document.getElementById('add-row').style.display='none';d
 function addTask(){
   const text=document.getElementById('new-task-text').value.trim();
   if(!text)return;
-  tasks.unshift({id:'t'+Date.now(),text,client:document.getElementById('new-task-client').value,priority:document.getElementById('new-task-prio').value,done:false});
+  tasks.unshift({id:'t'+Date.now(),text,client:document.getElementById('new-task-client').value,priority:document.getElementById('new-task-prio').value,done:false,createdDate:new Date().toISOString().slice(0,10)});
   saveTasks();renderTasks();hideAddTask();
   document.getElementById('new-task-text').value='';
 }
