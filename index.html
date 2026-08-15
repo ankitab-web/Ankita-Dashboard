@@ -817,7 +817,7 @@ html,body{height:100%;overflow:hidden}.app{display:flex;height:100vh;overflow:hi
         <div id="team-overview-status" style="font-size:12px;color:var(--text2);margin-bottom:10px"></div>
         <table class="rec-table" id="team-overview-table" style="display:none">
           <thead>
-            <tr><th>Email</th><th>Last Synced</th><th>Tasks</th><th>Candidates</th><th>Commitments</th><th></th></tr>
+            <tr><th>Email</th><th>Last Synced</th><th>Hours Logged</th><th>Tasks (Done/Total)</th><th></th></tr>
           </thead>
           <tbody id="team-overview-body"></tbody>
         </table>
@@ -8945,20 +8945,28 @@ loadAll(); if(!loadFromURL()){ renderAll(); } else { renderAll(); } setGreeting(
         return;
       }
       body.innerHTML = '';
-      rows.forEach(function(row){
+      rows.forEach(function(row, idx){
         var d = row.backup_data || {};
-        var taskCount = (d.tasks && d.tasks.length) || 0;
-        var candCount = (d.candidates && d.candidates.length) || 0;
-        var commitCount = (d.commitments && d.commitments.length) || 0;
+        var tasks = d.tasks || [];
+        var timeLogs = d.timeLogs || [];
+        var totalHours = timeLogs.reduce(function(sum, t){ return sum + (parseFloat(t.hours) || 0); }, 0);
+        var doneCount = tasks.filter(function(t){ return t.done; }).length;
         var updated = row.updated_at ? new Date(row.updated_at).toLocaleString('en-IN') : '—';
+        var detailId = 'team-detail-' + idx;
+
         var tr = document.createElement('tr');
         tr.innerHTML = '<td>' + escapeHtml(row.email || '(unknown)') + '</td>' +
           '<td>' + escapeHtml(updated) + '</td>' +
-          '<td>' + taskCount + '</td>' +
-          '<td>' + candCount + '</td>' +
-          '<td>' + commitCount + '</td>' +
-          '<td><button class="btn" style="padding:4px 10px;font-size:11px" data-email="' + escapeHtml(row.email || '') + '">&#8659; Download JSON</button></td>';
-        tr.querySelector('button').addEventListener('click', function(){
+          '<td>' + totalHours.toFixed(1) + 'h</td>' +
+          '<td>' + doneCount + ' / ' + tasks.length + '</td>' +
+          '<td><button class="btn" style="padding:4px 10px;font-size:11px;margin-right:6px" data-toggle="' + detailId + '">View Details</button>' +
+          '<button class="btn" style="padding:4px 10px;font-size:11px" data-email="' + escapeHtml(row.email || '') + '">&#8659; JSON</button></td>';
+
+        tr.querySelector('[data-toggle]').addEventListener('click', function(){
+          var detailRow = document.getElementById(detailId);
+          detailRow.style.display = (detailRow.style.display === 'none') ? '' : 'none';
+        });
+        tr.querySelector('[data-email]').addEventListener('click', function(){
           var json = JSON.stringify(d, null, 2);
           var blob = new Blob([json], {type:'application/json'});
           var url = URL.createObjectURL(blob);
@@ -8971,6 +8979,24 @@ loadAll(); if(!loadFromURL()){ renderAll(); } else { renderAll(); } setGreeting(
           URL.revokeObjectURL(url);
         });
         body.appendChild(tr);
+
+        var detailTr = document.createElement('tr');
+        detailTr.id = detailId;
+        detailTr.style.display = 'none';
+        var taskRowsHtml = tasks.length ? tasks.slice().reverse().map(function(t){
+          return '<tr><td>' + escapeHtml(t.date||'') + '</td><td>' + escapeHtml(t.name||'') + '</td><td>' + escapeHtml(t.client||'') + '</td><td>' + escapeHtml(t.priority||'') + '</td><td>' + (t.done ? '<span class="status-badge">Done</span>' : 'Pending') + '</td></tr>';
+        }).join('') : '<tr><td colspan="5" style="color:var(--text3)">No tasks logged.</td></tr>';
+        var timeRowsHtml = timeLogs.length ? timeLogs.slice().reverse().map(function(t){
+          return '<tr><td>' + escapeHtml(t.date||'') + '</td><td>' + escapeHtml(t.client||'') + '</td><td>' + escapeHtml(t.activity||'') + '</td><td>' + (parseFloat(t.hours)||0).toFixed(1) + 'h</td></tr>';
+        }).join('') : '<tr><td colspan="4" style="color:var(--text3)">No time logged.</td></tr>';
+
+        detailTr.innerHTML = '<td colspan="5" style="background:var(--navy3);padding:16px">' +
+          '<div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px">Tasks</div>' +
+          '<table class="rec-table" style="margin-bottom:16px"><thead><tr><th>Date</th><th>Task</th><th>Client</th><th>Priority</th><th>Status</th></tr></thead><tbody>' + taskRowsHtml + '</tbody></table>' +
+          '<div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px">Time Log</div>' +
+          '<table class="rec-table"><thead><tr><th>Date</th><th>Client</th><th>Activity</th><th>Hours</th></tr></thead><tbody>' + timeRowsHtml + '</tbody></table>' +
+          '</td>';
+        body.appendChild(detailTr);
       });
       statusEl.innerText = 'Showing ' + rows.length + ' team member(s).';
       table.style.display = '';
