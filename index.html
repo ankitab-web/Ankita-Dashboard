@@ -696,6 +696,7 @@ html,body{height:100%;overflow:hidden}.app{display:flex;height:100vh;overflow:hi
       <button class="nav-item" onclick="showPage('recruitment',this)"><span class="nav-icon">&#9670;</span>Recruitment Tracker</button>
       <button class="nav-item" onclick="showPage('rec-mis',this)"><span class="nav-icon">&#9650;</span>Recruitment MIS</button>
       <button class="nav-item" onclick="showPage('appraisal',this)"><span class="nav-icon">&#9733;</span>KRA &amp; Appraisal</button>
+      <button class="nav-item" onclick="showPage('appraisal-guide',this)"><span class="nav-icon">&#128214;</span>Appraisal Process Guide</button>
     </div>
     <div class="nav-group">
       <div class="nav-label">Data Intelligence</div>
@@ -1344,6 +1345,128 @@ html,body{height:100%;overflow:hidden}.app{display:flex;height:100vh;overflow:hi
           </table>
         </div>
         <div id="apr-empty" class="empty" style="display:none">No appraisal records yet — add one above</div>
+      </div>
+    </div>
+
+    <!-- ══════ APPRAISAL PROCESS GUIDE ══════ -->
+    <div class="page" id="page-appraisal-guide">
+      <div class="page-header">
+        <div class="page-title">Appraisal <span>Process Guide</span></div>
+        <div class="page-sub">How to run a fair, modern appraisal — a reference for anyone new to the process</div>
+      </div>
+
+      <div class="card">
+        <div class="ctitle" style="margin-bottom:10px">The Modern Appraisal Philosophy</div>
+        <div style="font-size:13px;color:var(--text);line-height:1.7">
+          Appraisals have moved away from a once-a-year rating exercise decided unilaterally by one manager.
+          The right approach today combines <b style="color:var(--gold2)">KRA/goal achievement</b> with
+          <b style="color:var(--gold2)">competency assessment</b>, is built on
+          <b style="color:var(--gold2)">evidence gathered throughout the period</b> (not just what's remembered at the end),
+          and is a <b style="color:var(--gold2)">two-way conversation</b> — not a top-down verdict.
+          The employee should never be surprised by what they hear in the final meeting.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="ctitle" style="margin-bottom:16px">The 8-Step Appraisal Flow</div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+
+          <div style="display:flex;gap:14px">
+            <div style="flex-shrink:0;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center">1</div>
+            <div><div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px">Pre-Cycle Preparation</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.6">Confirm the appraisal period and timeline. Gather each employee's job description and prior KRAs. Notify both employee and manager of key dates well in advance, and share the appraisal form so there are no surprises about format.</div></div>
+          </div>
+
+          <div style="display:flex;gap:14px">
+            <div style="flex-shrink:0;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center">2</div>
+            <div><div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px">Goal &amp; KRA Alignment (Start of Cycle)</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.6">Set SMART, measurable KRAs together with the employee at the start of the period — never decided unilaterally by HR alone. Each goal should trace back to a real business priority so the employee understands why it matters.</div></div>
+          </div>
+
+          <div style="display:flex;gap:14px">
+            <div style="flex-shrink:0;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center">3</div>
+            <div><div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px">Ongoing Check-ins (Mid-Cycle)</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.6">Hold short, regular check-ins (monthly or quarterly) rather than waiting for one annual meeting. Document key feedback and incidents as they happen — this is what removes "surprises" at the final review and is the single biggest shift in modern appraisal practice.</div></div>
+          </div>
+
+          <div style="display:flex;gap:14px">
+            <div style="flex-shrink:0;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center">4</div>
+            <div><div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px">Employee Self-Assessment</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.6">Before the manager writes their view, the employee rates themselves against each KRA and competency, and shares their own account of achievements and challenges. This surfaces the employee's perspective early and makes the final conversation more balanced.</div></div>
+          </div>
+
+          <div style="display:flex;gap:14px">
+            <div style="flex-shrink:0;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center">5</div>
+            <div><div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px">Manager Assessment</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.6">The manager rates independently, using documented evidence from throughout the period rather than gut feeling. Watch for <b>recency bias</b> (over-weighting the last few weeks) and the <b>halo/horn effect</b> (letting one strong or weak trait color the entire rating).</div></div>
+          </div>
+
+          <div style="display:flex;gap:14px">
+            <div style="flex-shrink:0;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center">6</div>
+            <div><div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px">Calibration (Multiple Managers/Clients)</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.6">When more than one manager or client team is involved, compare ratings across the group before finalizing — this keeps standards consistent and fair, so one manager isn't rating harder or softer than another for the same performance level.</div></div>
+          </div>
+
+          <div style="display:flex;gap:14px">
+            <div style="flex-shrink:0;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center">7</div>
+            <div><div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px">Appraisal Discussion Meeting</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.6">A two-way dialogue, not a one-way lecture. Open with strengths, then move to improvement areas constructively and with specific examples. Listen as much as you talk, and agree on the final rating together rather than simply announcing it.</div></div>
+          </div>
+
+          <div style="display:flex;gap:14px">
+            <div style="flex-shrink:0;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center">8</div>
+            <div><div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px">Documentation, Development Plan &amp; Follow-up</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.6">Record the final form with signatures. Agree on a personalized training/development plan — not a generic list — and set goals for the next cycle. Schedule a follow-up check-in rather than letting the plan sit unopened until next year.</div></div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="ctitle" style="margin-bottom:10px">Pre-Meeting Checklist</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--text)">
+          <div>&#9744; Appraisal form/template ready and shared with the employee in advance</div>
+          <div>&#9744; KRA achievement data compiled with real evidence (not memory)</div>
+          <div>&#9744; Attendance / time-log / task records reviewed for the period</div>
+          <div>&#9744; Self-assessment collected from the employee beforehand</div>
+          <div>&#9744; Manager's draft rating prepared with clear justification for each score</div>
+          <div>&#9744; Meeting scheduled with enough advance notice — never sprung on the employee</div>
+          <div>&#9744; Private, uninterrupted meeting space/time arranged</div>
+        </div>
+      </div>
+
+      <div class="frow" style="align-items:stretch">
+        <div class="card" style="flex:1;min-width:280px">
+          <div class="ctitle" style="margin-bottom:10px;color:var(--green)">Do</div>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--text2);line-height:1.5">
+            <div>&#10003; Be specific — use real examples, not general impressions</div>
+            <div>&#10003; Focus feedback on behavior and outcomes, not personality</div>
+            <div>&#10003; Listen as much as you talk — make it a conversation</div>
+            <div>&#10003; Tie every rating back to documented evidence</div>
+            <div>&#10003; End with clear, agreed next steps and a development plan</div>
+          </div>
+        </div>
+        <div class="card" style="flex:1;min-width:280px">
+          <div class="ctitle" style="margin-bottom:10px;color:var(--red)">Don't</div>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--text2);line-height:1.5">
+            <div>&#10007; Rely only on the last few weeks (recency bias)</div>
+            <div>&#10007; Compare employees to each other in the meeting itself</div>
+            <div>&#10007; Raise negative feedback for the first time in this meeting</div>
+            <div>&#10007; Rush it — treat it as a real conversation, not paperwork</div>
+            <div>&#10007; Let one strong or weak trait color the entire rating</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="border-color:var(--gold)">
+        <div class="ctitle" style="margin-bottom:10px;color:var(--gold2)">What's Changed — Current Trends</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--text2);line-height:1.5">
+          <div>&#9670; <b style="color:var(--text)">Continuous feedback</b> is replacing the once-a-year-only review — regular check-ins throughout the cycle, not one big meeting</div>
+          <div>&#9670; <b style="color:var(--text)">Multi-source input</b> (peers, self-assessment, sometimes clients) is replacing a single manager's sole judgment</div>
+          <div>&#9670; <b style="color:var(--text)">Evidence and data-backed ratings</b> are replacing gut-feeling scores, reducing bias and disputes</div>
+          <div>&#9670; <b style="color:var(--text)">Personalized development plans</b> are replacing generic, one-size-fits-all training lists</div>
+          <div>&#9670; <b style="color:var(--text)">Two-way, coaching-style conversations</b> are replacing top-down, verdict-style delivery</div>
+        </div>
       </div>
     </div>
 
