@@ -695,6 +695,7 @@ html,body{height:100%;overflow:hidden}.app{display:flex;height:100vh;overflow:hi
       <div class="nav-label">Recruitment</div>
       <button class="nav-item" onclick="showPage('recruitment',this)"><span class="nav-icon">&#9670;</span>Recruitment Tracker</button>
       <button class="nav-item" onclick="showPage('rec-mis',this)"><span class="nav-icon">&#9650;</span>Recruitment MIS</button>
+      <button class="nav-item" onclick="showPage('appraisal',this)"><span class="nav-icon">&#9733;</span>KRA &amp; Appraisal</button>
     </div>
     <div class="nav-group">
       <div class="nav-label">Data Intelligence</div>
@@ -1282,6 +1283,67 @@ html,body{height:100%;overflow:hidden}.app{display:flex;height:100vh;overflow:hi
           </table>
         </div>
         <div id="rec-empty" class="empty" style="display:none">No candidates yet — add one above</div>
+      </div>
+    </div>
+
+    <!-- ══════ KRA & APPRAISAL TRACKER ══════ -->
+    <div class="page" id="page-appraisal">
+      <div class="page-header">
+        <div class="page-title">KRA <span>&amp; Appraisal</span> Tracker</div>
+        <div class="page-sub">Internal record only — track KRAs, ratings and appraisal status for client employees</div>
+      </div>
+
+      <div class="card">
+        <div class="ctitle" id="apr-form-title" style="margin-bottom:12px">Add New Appraisal Record</div>
+        <div class="frow">
+          <input class="fi" id="apr-employee" placeholder="Employee name">
+                    <select class="fs" id="apr-client">
+            <option value="">Select Client</option>
+            <option>Suyash</option><option>Watch Your Health</option><option>Sudha Solutions</option>
+            <option>Openspace Services</option><option>Capsicum Media Works</option><option>Bright Brain Marketing</option>
+            <option>Exfaq</option>
+          </select>
+          <input class="fi" id="apr-designation" placeholder="Designation / Role">
+        </div>
+        <div class="frow">
+          <input class="fi" id="apr-period" placeholder="Appraisal period (e.g. Apr 2026 - Sep 2026)">
+          <select class="fs" id="apr-rating">
+            <option value="">Rating</option>
+            <option>Outstanding</option>
+            <option>Exceeds Expectations</option>
+            <option>Meets Expectations</option>
+            <option>Needs Improvement</option>
+            <option>Unsatisfactory</option>
+          </select>
+          <select class="fs" id="apr-status">
+            <option>Draft</option>
+            <option>In Review</option>
+            <option>Completed</option>
+          </select>
+        </div>
+        <div class="frow">
+          <textarea class="fi" id="apr-kras" placeholder="Key Result Areas (one per line)" style="width:100%;min-height:70px;resize:vertical;font-family:Arial,sans-serif"></textarea>
+        </div>
+        <div class="frow">
+          <textarea class="fi" id="apr-comments" placeholder="Appraisal comments / notes" style="width:100%;min-height:60px;resize:vertical;font-family:Arial,sans-serif"></textarea>
+        </div>
+        <div class="frow">
+          <button class="btn gold" id="apr-submit-btn" onclick="addAppraisal()">+ Add Record</button>
+          <button class="btn" id="apr-cancel-btn" style="display:none" onclick="cancelEditAppraisal()">Cancel Edit</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="ctitle" style="margin-bottom:10px">All Appraisal Records</div>
+        <div style="overflow-x:auto">
+          <table class="rec-table">
+            <thead>
+              <tr><th>Employee</th><th>Client</th><th>Designation</th><th>Period</th><th>Rating</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody id="apr-tbody"></tbody>
+          </table>
+        </div>
+        <div id="apr-empty" class="empty" style="display:none">No appraisal records yet — add one above</div>
       </div>
     </div>
 
@@ -2007,6 +2069,7 @@ var CLIENTS = [
 var CN = CLIENTS.map(function(c){ return c.name; });
 
 var tasks = [], timeLogs = [], clientData = {}, focusItems = [], riskFlags = [], strategies = [];
+var appraisals = [];
 var hrMetrics = {attrition:0, offerdrop:0, hiringdays:0, openpos:0, attendance:0, grievances:0};
 
 CN.forEach(function(n){ clientData[n] = {payroll:'Pending', attendance:0, issues:0, hiring:0}; });
@@ -2032,6 +2095,7 @@ function saveAll() {
     localStorage.setItem('hrc-client-insights', JSON.stringify(clientInsights));
     localStorage.setItem('hrc-weekly-review', JSON.stringify(weeklyReview));
     localStorage.setItem('hrc-weekly-history', JSON.stringify(weeklyHistory));
+    localStorage.setItem('hrc-appraisals', JSON.stringify(appraisals));
   } catch(e) {}
   if (window.scheduleCloudSync) window.scheduleCloudSync();
 }
@@ -2057,6 +2121,7 @@ function loadAll() {
     var ci = localStorage.getItem('hrc-client-insights'); if (ci) clientInsights = JSON.parse(ci);
     var wr = localStorage.getItem('hrc-weekly-review'); if (wr) weeklyReview = JSON.parse(wr);
     var wh = localStorage.getItem('hrc-weekly-history'); if (wh) weeklyHistory = JSON.parse(wh);
+    var apr = localStorage.getItem('hrc-appraisals'); if (apr) appraisals = JSON.parse(apr);
   } catch(e) {}
 
   /* ── Sanitize timeLogs: fix hours as strings, missing date, missing client ── */
@@ -2520,6 +2585,7 @@ function renderAll() {
 
   renderFocus(); renderTasks(); renderTimeLog(); renderTaskTime(); renderRisk(); renderMetrics(); renderStrategy(); renderClients();
   renderUpcomingRisks(); renderClientInsights(); renderWeeklyReview(); renderDashPriorities(); renderDashUpcomingRisks();
+  renderCandidates(); updatePositionFilter(); renderAppraisals();
 }
 
 function renderFocus(){
@@ -5660,7 +5726,8 @@ function buildBackupObject() {
     mcStatus: mcStatus,
     clientInsights: clientInsights,
     weeklyReview: weeklyReview,
-    weeklyHistory: weeklyHistory
+    weeklyHistory: weeklyHistory,
+    appraisals: appraisals
   };
 }
 
@@ -5688,6 +5755,7 @@ function restoreBackupObject(backup) {
   if (backup.clientInsights) clientInsights = backup.clientInsights;
   if (backup.weeklyReview) weeklyReview = backup.weeklyReview;
   if (backup.weeklyHistory) weeklyHistory = backup.weeklyHistory;
+  if (backup.appraisals) appraisals = backup.appraisals;
   return true;
 }
 
@@ -5898,6 +5966,130 @@ function deleteCandidate(id) {
   candidates = candidates.filter(function(c){ return c.id !== id; });
   saveAll(); renderCandidates(); updatePositionFilter();
   showToast('&#128465;','Candidate removed','');
+}
+
+/* ══ KRA & APPRAISAL TRACKER ══ */
+var aprEditId = null;
+
+function addAppraisal() {
+  var employee = document.getElementById('apr-employee').value.trim();
+  var client = document.getElementById('apr-client').value;
+  if (!employee) { showToast('&#9888;','Employee name required',''); return; }
+  if (!client) { showToast('&#9888;','Please select a client',''); return; }
+
+  var rec = {
+    id: aprEditId || Date.now(),
+    employee: employee,
+    client: client,
+    designation: document.getElementById('apr-designation').value.trim(),
+    period: document.getElementById('apr-period').value.trim(),
+    kras: document.getElementById('apr-kras').value.trim(),
+    rating: document.getElementById('apr-rating').value,
+    comments: document.getElementById('apr-comments').value.trim(),
+    status: document.getElementById('apr-status').value || 'Draft',
+    addedOn: aprEditId ? (appraisals.find(function(a){return a.id===aprEditId;})||{}).addedOn : today()
+  };
+
+  if (aprEditId) {
+    appraisals = appraisals.map(function(a){ return a.id === aprEditId ? rec : a; });
+    aprEditId = null;
+    showToast('&#10003;','Appraisal record updated','');
+  } else {
+    appraisals.push(rec);
+    showToast('&#10003;','Appraisal record added','');
+  }
+
+  clearAppraisalForm();
+  saveAll();
+  renderAppraisals();
+}
+
+function clearAppraisalForm() {
+  ['apr-employee','apr-designation','apr-period','apr-kras','apr-comments'].forEach(function(id){
+    var el = document.getElementById(id); if (el) el.value = '';
+  });
+  var clientSel = document.getElementById('apr-client'); if (clientSel) clientSel.selectedIndex = 0;
+  var ratingSel = document.getElementById('apr-rating'); if (ratingSel) ratingSel.selectedIndex = 0;
+  var statusSel = document.getElementById('apr-status'); if (statusSel) statusSel.value = 'Draft';
+  document.getElementById('apr-form-title').textContent = 'Add New Appraisal Record';
+  document.getElementById('apr-submit-btn').textContent = '+ Add Record';
+  var cb = document.getElementById('apr-cancel-btn'); if (cb) cb.style.display = 'none';
+  aprEditId = null;
+}
+
+function cancelEditAppraisal() { clearAppraisalForm(); }
+
+function editAppraisal(id) {
+  var a = appraisals.find(function(x){ return x.id === id; });
+  if (!a) return;
+  aprEditId = id;
+  document.getElementById('apr-employee').value = a.employee || '';
+  document.getElementById('apr-designation').value = a.designation || '';
+  document.getElementById('apr-period').value = a.period || '';
+  document.getElementById('apr-kras').value = a.kras || '';
+  document.getElementById('apr-comments').value = a.comments || '';
+  if (a.client) document.getElementById('apr-client').value = a.client;
+  if (a.rating) document.getElementById('apr-rating').value = a.rating;
+  document.getElementById('apr-status').value = a.status || 'Draft';
+  document.getElementById('apr-form-title').textContent = 'Edit Appraisal — ' + a.employee;
+  document.getElementById('apr-submit-btn').textContent = 'Save Changes';
+  var cb = document.getElementById('apr-cancel-btn'); if (cb) cb.style.display = 'inline-block';
+  document.getElementById('page-appraisal').scrollTop = 0;
+  window.scrollTo(0,0);
+}
+
+function deleteAppraisal(id) {
+  if (!confirm('Delete this appraisal record? This cannot be undone.')) return;
+  appraisals = appraisals.filter(function(a){ return a.id !== id; });
+  saveAll(); renderAppraisals();
+  showToast('&#128465;','Appraisal record removed','');
+}
+
+function aprStatusBadge(status) {
+  var color = status === 'Completed' ? 'var(--green)' : (status === 'In Review' ? 'var(--amber)' : 'var(--text3)');
+  var bg = status === 'Completed' ? 'rgba(62,207,142,0.1)' : (status === 'In Review' ? 'rgba(240,169,58,0.1)' : 'rgba(255,255,255,0.06)');
+  return '<span class="status-badge" style="color:'+color+';background:'+bg+'">'+escapeHtmlMain(status)+'</span>';
+}
+
+function aprRatingBadge(rating) {
+  if (!rating) return '<span style="color:var(--text3)">—</span>';
+  var color = (rating === 'Outstanding' || rating === 'Exceeds Expectations') ? 'var(--green)' :
+              (rating === 'Meets Expectations') ? 'var(--accent2)' :
+              (rating === 'Needs Improvement') ? 'var(--amber)' : 'var(--red)';
+  return '<span style="color:'+color+';font-weight:600">'+escapeHtmlMain(rating)+'</span>';
+}
+
+function escapeHtmlMain(str) {
+  var d = document.createElement('div');
+  d.innerText = str == null ? '' : String(str);
+  return d.innerHTML;
+}
+
+function renderAppraisals() {
+  var tbody = document.getElementById('apr-tbody');
+  var emptyEl = document.getElementById('apr-empty');
+  if (!tbody) return;
+  if (!appraisals.length) {
+    tbody.innerHTML = '';
+    if (emptyEl) emptyEl.style.display = 'block';
+    return;
+  }
+  if (emptyEl) emptyEl.style.display = 'none';
+  var sorted = appraisals.slice().sort(function(a,b){ return (b.id||0) - (a.id||0); });
+  tbody.innerHTML = sorted.map(function(a){
+    return '<tr>' +
+      '<td>' + escapeHtmlMain(a.employee) + '</td>' +
+      '<td>' + escapeHtmlMain(a.client) + '</td>' +
+      '<td>' + escapeHtmlMain(a.designation || '—') + '</td>' +
+      '<td>' + escapeHtmlMain(a.period || '—') + '</td>' +
+      '<td>' + aprRatingBadge(a.rating) + '</td>' +
+      '<td>' + aprStatusBadge(a.status) + '</td>' +
+      '<td style="white-space:nowrap">' +
+        '<button class="btn" style="padding:4px 10px;font-size:11px;margin-right:6px" onclick="editAppraisal(' + a.id + ')">Edit</button>' +
+        '<button class="btn" style="padding:4px 10px;font-size:11px;color:var(--red)" onclick="deleteAppraisal(' + a.id + ')">Delete</button>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
 }
 
 function updateStage(id, newStage) {
